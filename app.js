@@ -113,6 +113,7 @@ app.put('/v1/lavaRapido/funcionario/:id', cors(), bodyParserJson, async function
     let idFuncionario = request.params.id
 
     let dadosBody = request.body
+    console.log(dadosBody);
     let novosDadosFuncionario = await controllerFuncionarios.setAtualizarFuncionario( idFuncionario, dadosBody,contentType )
 
     response.status(novosDadosFuncionario.status_code)

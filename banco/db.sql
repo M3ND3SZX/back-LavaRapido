@@ -1,6 +1,8 @@
 CREATE DATABASE db_lava_rapido;
 USE db_lava_rapido;
 
+drop database db_lava_rapido;
+
 /*************************
 Tabela Datas
 *************************/
@@ -12,6 +14,7 @@ datas date not null
 INSERT INTO tbl_datas(datas)VALUES
 ('2024-02-10');
 
+select * from tbl_datas;
 /*************************
 Tabela Horas
 *************************/
@@ -30,20 +33,33 @@ CREATE TABLE tbl_datas_horarios(
 id_data_horario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 id_horario int not null,
 id_data int not null,
+id_status int not null,
 constraint FK_HORARIO_DATA
 foreign key (id_horario) references tbl_horas (id_horario),
 constraint FK_DATA_HORARIO
-foreign key (id_data) references tbl_datas (id_data)
+foreign key (id_data) references tbl_datas (id_data),
+constraint FK_STATUS_HORARIO
+foreign key (id_status) references tbl_status_horario(id_status)
 );
 
-INSERT INTO tbl_datas_horarios(id_horario, id_data)VALUES
-(1,1);
+create table tbl_status_horario (
+id_status int not null auto_increment primary key,
+horario_status varchar(50)
+);
 
+select * from tbl_status_horario;
+
+INSERT INTO tbl_datas_horarios(id_horario, id_data, id_status)VALUES
+(1,1, 1);
+
+
+
+select * from tbl_datas_horarios;
 
 /*************************
 Tabela Endereços
 *************************/
-CREATE TABLE tbl_enderecos(
+CREATE TABLE tbl_enderecos_cliente(
 id_endereco INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 rua varchar(45),
 cep float,
@@ -54,7 +70,7 @@ estado varchar(80),
 cidade varchar(80)
 );
 
-INSERT INTO tbl_enderecos(rua, cep, numero, complemento, bairro, estado, cidade)VALUES
+INSERT INTO tbl_enderecos_cliente(rua, cep, numero, complemento, bairro, estado, cidade)VALUES
 ('Rua Belval',
 '64782358',
 '39',
@@ -62,6 +78,17 @@ INSERT INTO tbl_enderecos(rua, cep, numero, complemento, bairro, estado, cidade)
 'Vila Barros',
 'São Paulo',
 'Carapicuíba');
+
+CREATE TABLE tbl_enderecos_funcionarios(
+id_endereco INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+rua varchar(45),
+cep float,
+numero float,
+complemento varchar(100),
+bairro varchar(150),
+estado varchar(80),
+cidade varchar(80)
+);
 
 
 
@@ -81,7 +108,7 @@ senha varchar(100),
 telefone varchar(18),
 id_endereco int not null,
 constraint FK_ENDERECO_CLIENTE
-foreign key (id_endereco) references tbl_enderecos (id_endereco)
+foreign key (id_endereco) references tbl_enderecos_cliente (id_endereco)
 );
 
 INSERT INTO tbl_clientes(nome, foto, email, senha, telefone, id_endereco)VALUES
@@ -107,7 +134,7 @@ cargo varchar(30),
 telefone varchar(18),
 id_endereco int not null,
 constraint FK_ENDERECO_FUNCIONARIO
-foreign key (id_endereco) references tbl_enderecos (id_endereco)
+foreign key (id_endereco) references tbl_enderecos_funcionarios (id_endereco)
 );
 
 INSERT INTO tbl_funcionarios(nome, email, senha, cargo, telefone, id_endereco)VALUES
@@ -118,9 +145,7 @@ INSERT INTO tbl_funcionarios(nome, email, senha, cargo, telefone, id_endereco)VA
 '11637864582',
 1);
 
-
-
-
+select * from tbl_funcionarios;
 
 /*************************
 Tabela Serviços
@@ -175,6 +200,8 @@ INSERT INTO tbl_clientes_veiculos(id_cliente, id_veiculo)VALUES
 (1,1);
 
 
+select * from tbl_clientes_veiculos;
+
 
 /*************************
 Tabela Agendamentos
@@ -189,7 +216,7 @@ constraint FK_CLIENTE_VEICULO_AGENDAMENTO
 foreign key (id_cliente_veiculo) references tbl_clientes_veiculos (id_cliente_veiculo)
 );
 
-
+select * from tbl_agendamentos;
 
 INSERT INTO tbl_agendamentos(id_data_horario, id_cliente_veiculo)VALUES
 (1,1);
@@ -210,7 +237,7 @@ foreign key (id_servico) references tbl_servicos (id_servico)
 
 INSERT INTO tbl_servicos_agendamentos(detalhes_adicionais, id_agendamento, id_servico)VALUES
 (null,
-1,1);
+2,1);
 
 
 
@@ -228,7 +255,7 @@ foreign key (id_funcionario) references tbl_funcionarios (id_funcionario)
 );
 
 INSERT INTO tbl_agendamentos_funcionarios(id_agendamento, id_funcionario)VALUES
-(1,1);
+(2,1);
 
 
 /*************************
@@ -240,9 +267,9 @@ forma_pagamento varchar(20)
 );
 
 INSERT INTO tbl_formas_pagamentos(forma_pagamento)VALUES
-('Crédito');
+('Débito');
 
-
+select * from tbl_formas_pagamentos;
 
 
 /*************************
@@ -268,6 +295,7 @@ INSERT INTO tbl_pagamentos(valor_pago, data_pagamento, horario_pagamento, id_ser
 1,
 1);
 
+select * from tbl_pagamentos;
 
 /*************************
 Tabela Recibos
@@ -282,7 +310,7 @@ foreign key (id_pagamento) references tbl_pagamentos (id_pagamento)
 
 INSERT INTO tbl_recibos(data_emissao, id_pagamento)VALUES
 ('2024-02-10',
-1);
+2);
 
 
 
@@ -343,6 +371,7 @@ WHERE
 -- Consultar agendamentos associados a um funcionário pelo nome do funcionário
 CREATE VIEW vw_agendamentos_por_funcionario AS
 SELECT
+	tbl_funcionarios.id_funcionario,
     tbl_funcionarios.nome AS nome_funcionario,
     tbl_clientes.nome AS nome_cliente,
     tbl_clientes.email AS email_cliente,
@@ -354,6 +383,7 @@ SELECT
     tbl_veiculos.cor,
     tbl_servicos.tipo_servico,
     tbl_servicos.descricao,
+    tbl_servicos.preco as valor_do_servico,
     tbl_datas.datas as dia,
     tbl_horas.horas as hora
 FROM
@@ -378,6 +408,7 @@ JOIN
     tbl_servicos_agendamentos ON tbl_agendamentos.id_agendamento = tbl_servicos_agendamentos.id_agendamento
 JOIN
     tbl_servicos ON tbl_servicos_agendamentos.id_servico = tbl_servicos.id_servico;
+
 
     
 SELECT * FROM vw_agendamentos_por_funcionario
@@ -453,7 +484,7 @@ FROM
 WHERE 
     tc.id_cliente = '1';
     
-  DELIMITER //
+DELIMITER //
 
 CREATE PROCEDURE inserir_funcionario_com_endereco (
     IN p_nome VARCHAR(100),
@@ -472,29 +503,31 @@ CREATE PROCEDURE inserir_funcionario_com_endereco (
 BEGIN
     DECLARE v_id_endereco INT;
 
-    -- Inserir o endereço
-    INSERT INTO tbl_enderecos (rua, cep, numero, complemento, bairro, estado, cidade)
+ 
+    INSERT INTO tbl_enderecos_funcionarios (rua, cep, numero, complemento, bairro, estado, cidade)
     VALUES (p_rua, p_cep, p_numero, p_complemento, p_bairro, p_estado, p_cidade);
 
-    -- Obter o ID do endereço inserido
+   
     SET v_id_endereco = LAST_INSERT_ID();
 
-    -- Inserir o funcionário
+  
     INSERT INTO tbl_funcionarios (nome, email, senha, cargo, telefone, id_endereco)
     VALUES (p_nome, p_email, p_senha, p_cargo, p_telefone, v_id_endereco);
 END//
 
-DELIMITER ;
+
 	
 CALL inserir_funcionario_com_endereco('Julia', 'julia@gmail', '1234', 'Lavador', '11980807794', 'rua sao mateus', '06332020', 
 '260', 'torre 1 apto 154', 'vila ester', 'sao paulo', 'carapicuiba');
 
-create view vw_selecionar_endereço_funcionario as
+create view vw_selecionar_endereco_funcionario as
 select tf.id_funcionario, tf.nome, te.id_endereco, te.rua, te.cep, te.numero, te.complemento, te.bairro, te.estado, te.cidade 
 from tbl_funcionarios as tf 
-join tbl_enderecos as te ON tf.id_endereco = te.id_endereco 
+join tbl_enderecos_funcionarios as te ON tf.id_endereco = te.id_endereco 
 
 
+
+select * from vw_selecionar_endereco_funcionario where id_funcionario = 2;
 
 DELIMITER //
 
@@ -514,12 +547,13 @@ CREATE PROCEDURE p_atualizar_funcionario_com_endereco (
     IN p_cidade VARCHAR(80)
 )
 BEGIN
+DECLARE v_id_endereco INT;
 
-SELECT id_endereco INTO v_id_endereco
+SELECT id_endereco into v_id_endereco
     FROM tbl_funcionarios
     WHERE id_funcionario = p_id_funcionario;
   
-    UPDATE tbl_enderecos
+    UPDATE tbl_enderecos_funcionarios
     SET
         rua = p_rua,
         cep = p_cep,
@@ -539,12 +573,38 @@ SELECT id_endereco INTO v_id_endereco
         cargo = p_cargo,
         telefone = p_telefone,
         id_endereco = p_id_endereco
-    WHERE id = 3;
+    WHERE id_funcionario = p_id_funcionario ;
+END //
+
+drop trigger before_delete_funcionario;
+
+
+DELIMITER //
+
+CREATE TRIGGER before_delete_funcionario
+BEFORE DELETE ON tbl_funcionarios
+FOR EACH ROW
+BEGIN
+    -- Deletar as relações na tabela tbl_agendamentos_funcionarios
+    DELETE FROM tbl_agendamentos_funcionarios 
+    WHERE id_funcionario = OLD.id_funcionario;
+
+    -- Deletar o endereço do funcionário se não for mais referenciado por outros funcionários
+    DELETE FROM tbl_enderecos_funcionarios 
+    WHERE id_endereco = OLD.id_endereco 
+    AND NOT EXISTS (
+        SELECT 1 FROM tbl_funcionarios 
+        WHERE id_endereco = OLD.id_endereco 
+        AND id_funcionario != OLD.id_funcionario
+    );
 END //
 
 DELIMITER ;
 
-CALL atualizar_funcionario_com_endereco(
+DELETE FROM tbl_funcionarios WHERE tbl_funcionarios.id_funcionario = 1;
+
+CALL p_atualizar_funcionario_com_endereco(
+	1,
     'João Atualizado',  
     'joao.atualizado@example.com',
     'nova_senha123',  
@@ -559,6 +619,56 @@ CALL atualizar_funcionario_com_endereco(
     'São Paulo' 
 ); 
 
+DELIMITER //
+
+CREATE PROCEDURE p_atualizar_funcionario_com_endereco(
+    IN p_id_funcionario INT,
+    IN p_nome VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_senha VARCHAR(255),
+    IN p_cargo VARCHAR(255),
+    IN p_telefone VARCHAR(20),
+    IN p_rua VARCHAR(255),
+    IN p_cep DECIMAL(9, 3),
+    IN p_numero INT,
+    IN p_complemento VARCHAR(255),
+    IN p_bairro VARCHAR(255),
+    IN p_estado VARCHAR(2),
+    IN p_cidade VARCHAR(255)
+)
+BEGIN
+    DECLARE v_id_endereco INT;
+
+    -- Obter o id_endereco associado ao id_funcionario
+    SELECT id_endereco INTO v_id_endereco 
+    FROM tbl_funcionarios 
+    WHERE id_funcionario = p_id_funcionario;
+
+    -- Atualizar o endereço
+    UPDATE tbl_enderecos
+    SET
+        rua = p_rua,
+        cep = p_cep,
+        numero = p_numero,
+        complemento = p_complemento,
+        bairro = p_bairro,
+        estado = p_estado,
+        cidade = p_cidade
+    WHERE id_endereco = v_id_endereco;
+
+    -- Atualizar o funcionário
+    UPDATE tbl_funcionarios
+    SET
+        nome = p_nome,
+        email = p_email,
+        senha = p_senha,
+        cargo = p_cargo,
+        telefone = p_telefone
+    WHERE id_funcionario = p_id_funcionario;
+END;
+/
+
+
 
 
 DELIMITER //
@@ -568,25 +678,46 @@ CREATE PROCEDURE deletar_funcionario_com_endereco (
 )
 BEGIN
     DECLARE v_id_endereco INT;
-
-    -- Obter o ID do endereço associado ao funcionário
+    
     SELECT id_endereco INTO v_id_endereco
     FROM tbl_funcionarios
     WHERE id_funcionario = p_id_funcionario;
 
-    -- Deletar o funcionário
-    DELETE FROM tbl_funcionarios
-    WHERE id_funcionario = p_id_funcionario;
-
-    -- Deletar o endereço, se não for associado a outros funcionários
-    DELETE FROM tbl_enderecos
+    DELETE FROM tbl_enderecos_funcionarios
     WHERE id_endereco = v_id_endereco
     AND NOT EXISTS (SELECT 1 FROM tbl_funcionarios WHERE id_endereco = v_id_endereco);
+    
+     DELETE FROM tbl_funcionarios
+    WHERE id_funcionario = p_id_funcionario;
 END //
 
-DELIMITER ;
+show triggers;
+
+CALL deletar_funcionario_com_endereco(1);
+
+DELIMITER $
+
+CREATE TRIGGER before_delete_funcionario
+BEFORE DELETE ON tbl_funcionarios
+FOR EACH ROW
+BEGIN
+   
+    DELETE FROM tbl_enderecos_funcionarios WHERE id_endereco = OLD.id_endereco;
+
+    DELETE FROM tbl_agendamentos_funcionarios WHERE id_funcionario = OLD.id_funcionario;
+END $
+drop trigger before_delete_funcionario;
+
+delimiter //
+
+
+	p_data,
+    p_hora,
+    
+
+
 
 
 DROP PROCEDURE IF EXISTS deletar_funcionario_com_endereco;
 
-CALL deletar_funcionario_com_endereco(1);
+

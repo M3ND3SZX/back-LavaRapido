@@ -69,8 +69,7 @@ const insertFuncionarioEndereco = async function (dadosFuncionario) {
             '${dadosFuncionario.p_telefone}',
             '${dadosFuncionario.p_rua}',
             '${dadosFuncionario.p_cep}',
-            '${dadosFuncionario.p_numero}', 
-            '${dadosFuncionario.p_complemento}',
+            '${dadosFuncionario.p_numero}',
             '${dadosFuncionario.p_bairro}',
             '${dadosFuncionario.p_estado}',
             '${dadosFuncionario.p_cidade}'
@@ -91,15 +90,22 @@ const updateFuncionario = async function (id, dadosFuncionario) {
 
     try{
 
-         let sql =  ` UPDATE tbl_funcionarios SET 
-            nome = '${dadosFuncionario.nome}',
-            email = '${dadosFuncionario.email}',
-            senha = '${dadosFuncionario.senha}',
-            cargo = '${dadosFuncionario.cargo}',
-            telefone = '${dadosFuncionario.telefone}',
-            id_endereco = '${dadosFuncionario.id_endereco}'
-            where (id_funcionario = ${id})`
+         let sql =  ` CALL p_atualizar_funcionario_com_endereco(
+            '${id}'
+            '${dadosFuncionario.p_nome}',  
+            '${dadosFuncionario.p_email}',
+            '${dadosFuncionario.p_senha}',  
+            '${dadosFuncionario.p_cargo}', 
+            '${dadosFuncionario.p_telefone}',  
+            '${dadosFuncionario.p_rua}',  
+            '${dadosFuncionario.p_cep}', 
+            '${dadosFuncionario.p_numero}',
+            '${dadosFuncionario.p_bairro}',
+            '${dadosFuncionario.p_estado}',
+            '${dadosFuncionario.p_cidade}'
+        ); `
        
+        console.log(sql);
     
         let rsFuncionario = await prisma.$executeRawUnsafe(sql)
     
@@ -111,6 +117,7 @@ const updateFuncionario = async function (id, dadosFuncionario) {
 
     }
     catch(error){
+        console.log(error);
         return false
     }
 

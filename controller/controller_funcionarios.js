@@ -68,7 +68,6 @@ const setInserirFuncionarioEndereco = async function (dadosFuncionario, contentT
                   dadosFuncionario.p_rua == ''            || dadosFuncionario.p_rua == undefined          || dadosFuncionario.p_rua == null             || dadosFuncionario.p_rua.length > 45    ||
                   dadosFuncionario.p_cep == ''            || dadosFuncionario.p_cep == undefined          || dadosFuncionario.p_cep == null             || isNaN(dadosFuncionario.p_cep)   ||
                   dadosFuncionario.p_numero == ''         || dadosFuncionario.p_numero == undefined       || dadosFuncionario.p_numero == null          || isNaN(dadosFuncionario.p_numero)   ||
-                  dadosFuncionario.p_complemento == ''    || dadosFuncionario.p_complemento == undefined  || dadosFuncionario.p_complemento == null     || dadosFuncionario.p_complemento.length > 100 ||
                   dadosFuncionario.p_bairro == ''         || dadosFuncionario.p_bairro == undefined       || dadosFuncionario.p_bairro == null          || dadosFuncionario.p_bairro.length > 150   ||
                   dadosFuncionario.p_estado == ''         || dadosFuncionario.p_estado == undefined       || dadosFuncionario.p_estado == null          || dadosFuncionario.p_estado.length > 80   ||
                   dadosFuncionario.p_cidade == ''         || dadosFuncionario.p_cidade == undefined       || dadosFuncionario.p_cidade == null          || dadosFuncionario.p_estado.length > 80   
@@ -177,12 +176,15 @@ const setInserirFuncionarioEndereco = async function (dadosFuncionario, contentT
     
                             let updateFuncionarioJson = {}
     
-                            if(dadosFuncionario.nome == ''          || dadosFuncionario.nome == undefined         || dadosFuncionario.nome == null            || dadosFuncionario.nome.length > 100  ||
-                            dadosFuncionario.email == ''          || dadosFuncionario.email == undefined        || dadosFuncionario.email == null           || dadosFuncionario.email.length >150  ||
-                            dadosFuncionario.senha == ''          || dadosFuncionario.senha == undefined        || dadosFuncionario.senha == null           || dadosFuncionario.senha.length > 100 ||  
-                            dadosFuncionario.cargo == ''          || dadosFuncionario.cargo == undefined        || dadosFuncionario.cargo == null           || dadosFuncionario.cargo.length > 30  ||
-                            dadosFuncionario.telefone == ''       || dadosFuncionario.telefone == undefined     || dadosFuncionario.telefone == null        || dadosFuncionario.telefone.length > 18 ||
-                            dadosFuncionario.id_endereco == ''    || dadosFuncionario.id_endereco == undefined  || dadosFuncionario.id_endereco == null     || isNaN(dadosFuncionario.id_endereco)
+                            if(dadosFuncionario.p_nome == ''          || dadosFuncionario.p_nome == undefined         || dadosFuncionario.p_nome == null            || dadosFuncionario.p_nome.length > 100  ||
+                            dadosFuncionario.p_email == ''          || dadosFuncionario.p_email == undefined        || dadosFuncionario.p_email == null           || dadosFuncionario.p_email.length >150  ||
+                            dadosFuncionario.p_senha == ''          || dadosFuncionario.p_senha == undefined        || dadosFuncionario.p_senha == null           || dadosFuncionario.p_senha.length > 100 ||  
+                            dadosFuncionario.p_cargo == ''          || dadosFuncionario.p_cargo == undefined        || dadosFuncionario.p_cargo == null           || dadosFuncionario.p_cargo.length > 30  ||
+                            dadosFuncionario.p_telefone == ''       || dadosFuncionario.p_telefone == undefined     || dadosFuncionario.p_telefone == null        || dadosFuncionario.p_telefone.length > 18  ||
+                            dadosFuncionario.p_rua == ''            || dadosFuncionario.p_rua == undefined          || dadosFuncionario.p_rua == null             || dadosFuncionario.p_rua.length > 45    ||                            dadosFuncionario.p_numero == ''         || dadosFuncionario.p_numero == undefined       || dadosFuncionario.p_numero == null          || isNaN(dadosFuncionario.p_numero)   ||
+                            dadosFuncionario.p_bairro == ''         || dadosFuncionario.p_bairro == undefined       || dadosFuncionario.p_bairro == null          || dadosFuncionario.p_bairro.length > 150   ||
+                            dadosFuncionario.p_estado == ''         || dadosFuncionario.p_estado == undefined       || dadosFuncionario.p_estado == null          || dadosFuncionario.p_estado.length > 80   ||
+                            dadosFuncionario.p_cidade == ''         || dadosFuncionario.p_cidade == undefined       || dadosFuncionario.p_cidade == null          || dadosFuncionario.p_estado.length > 80 
                              ){
                                 return message.ERROR_REQUIRED_FIELDS
                             } else {
